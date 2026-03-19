@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ listing.title }} — SAB Trading Plaza{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2rem">
+
+  <div style="margin-bottom:1.5rem">
+    <a href="{% url 'index' %}" class="btn btn-outline btn-sm">← Назад</a>
+  </div>
+
+  <div class="detail-layout">
+    <!-- LEFT: Listing -->
+    <div>
+      <div class="detail-card">
+        <div class="detail-header">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem">
+            <span class="cat-badge cat-{{ listing.category }}" style="font-size:0.85rem; padding:6px 18px">
+              {% if listing.category == 'trade' %}🔄 ТРЕЙД
+              {% elif listing.category == 'sell' %}💰 ПРОДАЮ
+              {% else %}🎁 РАЗДАЧА{% endif %}
+            </span>
+            <span style="font-size:0.8rem; color:var(--text-muted); font-family:'Share Tech Mono',monospace">
+              {{ listing.created_at|date:"d.m.Y H:i" }}
+            </span>
+          </div>
+          <h1 style="font-family:'Orbitron',monospace; font-size:1.3rem; color:var(--text-primary); margin-top:14px; letter-spacing:1px">
+            {{ listing.title }}
+          </h1>
+        </div>
+
+        <div class="detail-brainrot-section">
+          <div class="detail-brainrot-img">
+            {% if listing.get_brainrot_image %}
+              <img src="{{ listing.get_brainrot_image }}" alt="{{ listing.get_brainrot_name }}">
+            {% else %}
+              🧠
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px">Брейнрот</div>
+            <div style="font-family:'Orbitron',monospace; font-size:1.1rem; color:var(--green-neon); font-weight:700; margin-bottom:8px">
+              {{ listing.get_brainrot_name }}
+            </div>
+            {% if listing.brainrot %}
+              <span class="rarity-badge r-{{ listing.brainrot.rarity }}" style="font-size:0.8rem; padding:4px 14px">
+                {{ listing.brainrot.get_rarity_display }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="detail-body">
+          <div class="section-title">📝 Описание</div>
+          <p style="line-height:1.7; color:var(--text-primary); font-size:1rem">{{ listing.description }}</p>
+
+          {% if listing.want_description %}
+            <div style="margin-top:20px">
+              <div class="section-title">🔄 Хочу получить</div>
+              <div style="background:rgba(0,255,136,0.05); border:1px solid var(--border-green); border-radius:10px; padding:16px; font-size:1rem; color:var(--green-neon); font-weight:600">
+                {{ listing.want_description }}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if user == listing.author %}
+            <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border-green)">
+              <a href="{% url 'delete_listing' listing.pk %}" class="btn btn-danger">
+                🗑️ Удалить объявление
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="comments-section">
+        <div class="comments-header">
+          <div class="section-title" style="margin-bottom:0">💬 Комментарии ({{ comments.count }})</div>
+        </div>
+
+        {% if comments %}
+          {% for comment in comments %}
+            <div class="comment-item {% if comment.is_trade_offer %}is-offer{% endif %}">
+              <div class="comment-avatar">
+                {% if comment.author.profile.avatar %}
+                  <img src="{{ comment.author.profile.avatar.url }}" alt="">
+                {% else %}
+                  {{ comment.author.profile.display_name|slice:":1"|upper }}
+                {% endif %}
+              </div>
+              <div class="comment-content">
+                <div class="comment-meta">
+                  <a href="{% url 'profile' comment.author.username %}" class="comment-user">
+                    {{ comment.author.profile.display_name }}
+                  </a>
+                  {% if comment.is_trade_offer %}
+                    <span class="offer-tag">🔄 ПРЕДЛОЖЕНИЕ</span>
+                  {% endif %}
+                  <span class="comment-time">{{ comment.created_at|timesince }} назад</span>
+                </div>
+                <div class="comment-text">{{ comment.text }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="padding:32px; text-align:center; color:var(--text-muted)">
+            Комментариев пока нет. Напишите первым!
+          </div>
+        {% endif %}
+
+        <!-- Comment Form -->
+        <div class="comment-form">
+          {% if user.is_authenticated %}
+            <form method="post">
+              {% csrf_token %}
+              <textarea name="text" class="comment-input" rows="3"
+                placeholder="Напишите предложение или вопрос... (макс. 500 символов)"
+                style="width:100%; background:var(--bg-secondary); border:1px solid var(--border-green); border-radius:8px; color:var(--text-primary); font-family:'Rajdhani',sans-serif; font-size:1rem; padding:12px 16px; outline:none; resize:vertical"
+                maxlength="500" required></textarea>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:12px; flex-wrap:wrap; gap:10px">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; color:var(--text-secondary)">
+                  <input type="checkbox" name="is_trade_offer" style="accent-color:var(--green-neon)">
+                  🔄 Это предложение о трейде
+                </label>
+                <button type="submit" class="btn btn-primary">Отправить 💬</button>
+              </div>
+            </form>
+          {% else %}
+            <div style="text-align:center; color:var(--text-muted)">
+              <a href="{% url 'login' %}" class="btn btn-outline">Войдите чтобы написать</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Author -->
+    <div>
+      <div class="author-card">
+        <div class="section-title">👤 Автор объявления</div>
+        <div class="author-big-avatar">
+          {% if listing.author.profile.avatar %}
+            <img src="{{ listing.author.profile.avatar.url }}" alt="">
+          {% else %}
+            {{ listing.author.profile.display_name|slice:":1"|upper }}
+          {% endif %}
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Orbitron',monospace; font-size:1.1rem; color:var(--green-neon); font-weight:700">
+            <a href="{% url 'profile' listing.author.username %}" style="color:inherit; text-decoration:none">
+              {{ listing.author.profile.display_name }}
+            </a>
+          </div>
+          <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px">@{{ listing.author.username }}</div>
+          {% if listing.author.profile.roblox_username %}
+            <div style="margin-top:6px; font-size:0.85rem; color:var(--text-secondary)">
+              🎮 {{ listing.author.profile.roblox_username }}
+            </div>
+          {% endif %}
+          {% if listing.author.profile.bio %}
+            <div style="margin-top:10px; font-size:0.9rem; color:var(--text-muted); line-height:1.5">
+              {{ listing.author.profile.bio }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="contact-info">
+          {% if listing.author.profile.phone %}
+            <div class="contact-item">
+              <span class="icon">📱</span>
+              <span class="val">{{ listing.author.profile.phone }}</span>
+            </div>
+          {% endif %}
+          <div class="contact-item">
+            <span class="icon">✉️</span>
+            <span class="val">{{ listing.author.email }}</span>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; text-align:center">
+          <div style="font-size:0.85rem; color:var(--text-muted)">
+            Всего объявлений: <strong style="color:var(--green-neon)">{{ listing.author.listings.count }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

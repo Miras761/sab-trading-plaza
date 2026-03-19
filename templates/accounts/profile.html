@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.profile.display_name }} — SAB Trading Plaza{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:2rem">
+
+  <div class="profile-header">
+    <div class="profile-avatar">
+      {% if profile_user.profile.avatar %}
+        <img src="{{ profile_user.profile.avatar.url }}" alt="">
+      {% else %}
+        {{ profile_user.profile.display_name|slice:":1"|upper }}
+      {% endif %}
+    </div>
+    <div class="profile-name">{{ profile_user.profile.display_name }}</div>
+    <div class="profile-username">@{{ profile_user.username }}</div>
+    {% if profile_user.profile.roblox_username %}
+      <div style="margin-top:8px; color:var(--text-secondary); font-size:0.9rem">
+        🎮 Roblox: <strong>{{ profile_user.profile.roblox_username }}</strong>
+      </div>
+    {% endif %}
+    {% if profile_user.profile.bio %}
+      <div style="margin-top:12px; color:var(--text-muted); max-width:500px; margin-left:auto; margin-right:auto; line-height:1.6">
+        {{ profile_user.profile.bio }}
+      </div>
+    {% endif %}
+
+    <div style="display:flex; justify-content:center; gap:1rem; margin-top:16px; flex-wrap:wrap">
+      {% if profile_user.profile.phone %}
+        <div class="contact-item" style="display:inline-flex">
+          <span class="icon">📱</span>
+          <span class="val">{{ profile_user.profile.phone }}</span>
+        </div>
+      {% endif %}
+      <div class="contact-item" style="display:inline-flex">
+        <span class="icon">✉️</span>
+        <span class="val">{{ profile_user.email }}</span>
+      </div>
+    </div>
+
+    {% if user == profile_user %}
+      <div style="margin-top:20px">
+        <a href="{% url 'edit_profile' %}" class="btn btn-outline">✏️ Редактировать профиль</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <h2 style="font-family:'Orbitron',monospace; font-size:1.1rem; color:var(--green-neon); letter-spacing:2px; margin-bottom:1.5rem">
+    📋 Объявления ({{ listings.count }})
+  </h2>
+
+  {% if listings %}
+    <div class="listings-grid">
+      {% for listing in listings %}
+      <a href="{% url 'listing_detail' listing.pk %}" class="listing-card">
+        <div class="card-header">
+          <span class="cat-badge cat-{{ listing.category }}">
+            {% if listing.category == 'trade' %}🔄 ТРЕЙД{% elif listing.category == 'sell' %}💰 ПРОДАЮ{% else %}🎁 РАЗДАЧА{% endif %}
+          </span>
+          <span class="card-time">{{ listing.created_at|timesince }} назад</span>
+        </div>
+        <div class="card-body">
+          <div class="brainrot-row">
+            <div class="brainrot-img-wrap">
+              {% if listing.get_brainrot_image %}<img src="{{ listing.get_brainrot_image }}" alt="">{% else %}🧠{% endif %}
+            </div>
+            <div class="brainrot-info">
+              <div class="brainrot-name">{{ listing.get_brainrot_name }}</div>
+              {% if listing.brainrot %}<span class="rarity-badge r-{{ listing.brainrot.rarity }}">{{ listing.brainrot.get_rarity_display }}</span>{% endif %}
+            </div>
+          </div>
+          <div class="card-title">{{ listing.title }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-text">Нет активных объявлений</div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
