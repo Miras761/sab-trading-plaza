@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SAB Trading Plaza — Трейды и Продажа Брейнротов{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+  <div class="hero-title">SAB TRADING PLAZA<span class="cursor">_</span></div>
+  <div class="hero-sub">// Steal a Brainrot — Торговая площадка //</div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-number">{{ stats.total }}</div>
+      <div class="stat-label">Объявлений</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ stats.trade }}</div>
+      <div class="stat-label">🔄 Трейд</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ stats.sell }}</div>
+      <div class="stat-label">💰 Продажи</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ stats.giveaway }}</div>
+      <div class="stat-label">🎁 Раздача</div>
+    </div>
+  </div>
+
+  {% if user.is_authenticated %}
+    <a href="{% url 'create_listing' %}" class="btn btn-primary" style="font-size:1rem; padding:14px 32px;">
+      ➕ Создать объявление
+    </a>
+  {% else %}
+    <a href="{% url 'register' %}" class="btn btn-primary" style="font-size:1rem; padding:14px 32px;">
+      🚀 Войти и торговать
+    </a>
+  {% endif %}
+</div>
+
+<div class="container">
+
+  <!-- Category Tabs -->
+  <div class="cat-tabs">
+    <a href="?category=&search={{ search }}" class="cat-tab {% if not selected_category %}active-all{% endif %}">🌐 Все</a>
+    <a href="?category=trade&search={{ search }}" class="cat-tab {% if selected_category == 'trade' %}active-trade{% endif %}">🔄 Трейд</a>
+    <a href="?category=sell&search={{ search }}" class="cat-tab {% if selected_category == 'sell' %}active-sell{% endif %}">💰 Продаю</a>
+    <a href="?category=giveaway&search={{ search }}" class="cat-tab {% if selected_category == 'giveaway' %}active-giveaway{% endif %}">🎁 Раздача</a>
+  </div>
+
+  <!-- Search -->
+  <form method="get" class="search-bar">
+    <input type="hidden" name="category" value="{{ selected_category }}">
+    <input type="text" name="search" value="{{ search }}" placeholder="🔍 Поиск брейнрота..." class="search-input">
+    <button type="submit" class="btn btn-outline">Найти</button>
+  </form>
+
+  <!-- Listings -->
+  {% if listings %}
+    <div class="listings-grid">
+      {% for listing in listings %}
+      <a href="{% url 'listing_detail' listing.pk %}" class="listing-card">
+        <div class="card-header">
+          <span class="cat-badge cat-{{ listing.category }}">
+            {% if listing.category == 'trade' %}🔄 ТРЕЙД
+            {% elif listing.category == 'sell' %}💰 ПРОДАЮ
+            {% else %}🎁 РАЗДАЧА{% endif %}
+          </span>
+          <span class="card-time">{{ listing.created_at|timesince }} назад</span>
+        </div>
+
+        <div class="card-body">
+          <div class="brainrot-row">
+            <div class="brainrot-img-wrap">
+              {% if listing.get_brainrot_image %}
+                <img src="{{ listing.get_brainrot_image }}" alt="{{ listing.get_brainrot_name }}">
+              {% else %}
+                🧠
+              {% endif %}
+            </div>
+            <div class="brainrot-info">
+              <div class="brainrot-name">{{ listing.get_brainrot_name }}</div>
+              {% if listing.brainrot %}
+                <span class="rarity-badge r-{{ listing.brainrot.rarity }}">{{ listing.brainrot.get_rarity_display }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="card-title">{{ listing.title }}</div>
+          <div class="card-desc">{{ listing.description }}</div>
+
+          {% if listing.want_description and listing.category != 'giveaway' %}
+            <div class="card-want">
+              <strong>Хочу:</strong> {{ listing.want_description }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="card-footer">
+          <div class="author-row">
+            <div class="author-avatar">
+              {% if listing.author.profile.avatar %}
+                <img src="{{ listing.author.profile.avatar.url }}" alt="">
+              {% else %}
+                {{ listing.author.profile.display_name|slice:":1"|upper }}
+              {% endif %}
+            </div>
+            <span class="author-name">{{ listing.author.profile.display_name }}</span>
+          </div>
+          <span class="comments-count">💬 {{ listing.comments.count }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🧠</div>
+      <div class="empty-text">Объявлений не найдено. Будь первым!</div>
+      {% if user.is_authenticated %}
+        <br><a href="{% url 'create_listing' %}" class="btn btn-primary" style="margin-top:1rem">➕ Создать объявление</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

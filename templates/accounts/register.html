@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация — SAB Trading Plaza{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div style="font-size:3rem">🧠</div>
+      <div class="auth-title">SAB PLAZA</div>
+      <div class="auth-sub">// Регистрация //</div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% for err in field.errors %}
+            <div class="form-error">❌ {{ err }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; margin-top:0.5rem; font-size:1rem">
+        🚀 Зарегистрироваться
+      </button>
+    </form>
+
+    <div class="divider">уже есть аккаунт?</div>
+    <a href="{% url 'login' %}" class="btn btn-outline" style="width:100%; justify-content:center; padding:12px">
+      Войти
+    </a>
+  </div>
+</div>
+{% endblock %}

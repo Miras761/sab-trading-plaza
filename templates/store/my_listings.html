@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Мои объявления — SAB Trading Plaza{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2rem">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem">
+    <h1 style="font-family:'Orbitron',monospace; font-size:1.4rem; color:var(--green-neon); letter-spacing:2px">📋 Мои объявления</h1>
+    <a href="{% url 'create_listing' %}" class="btn btn-primary">➕ Новое</a>
+  </div>
+
+  {% if listings %}
+    <div class="listings-grid">
+      {% for listing in listings %}
+      <a href="{% url 'listing_detail' listing.pk %}" class="listing-card">
+        <div class="card-header">
+          <span class="cat-badge cat-{{ listing.category }}">
+            {% if listing.category == 'trade' %}🔄 ТРЕЙД{% elif listing.category == 'sell' %}💰 ПРОДАЮ{% else %}🎁 РАЗДАЧА{% endif %}
+          </span>
+          <a href="{% url 'delete_listing' listing.pk %}" class="btn btn-danger btn-sm" onclick="event.preventDefault(); event.stopPropagation(); window.location='{% url 'delete_listing' listing.pk %}'">🗑️</a>
+        </div>
+        <div class="card-body">
+          <div class="brainrot-row">
+            <div class="brainrot-img-wrap">
+              {% if listing.get_brainrot_image %}<img src="{{ listing.get_brainrot_image }}" alt="">{% else %}🧠{% endif %}
+            </div>
+            <div class="brainrot-info">
+              <div class="brainrot-name">{{ listing.get_brainrot_name }}</div>
+              {% if listing.brainrot %}<span class="rarity-badge r-{{ listing.brainrot.rarity }}">{{ listing.brainrot.get_rarity_display }}</span>{% endif %}
+            </div>
+          </div>
+          <div class="card-title">{{ listing.title }}</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-time">{{ listing.created_at|timesince }} назад</span>
+          <span class="comments-count">💬 {{ listing.comments.count }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-text">У вас нет активных объявлений</div>
+      <a href="{% url 'create_listing' %}" class="btn btn-primary" style="margin-top:1.5rem">➕ Создать первое объявление</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

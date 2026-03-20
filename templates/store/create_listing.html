@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Создать объявление — SAB Trading Plaza{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2rem">
+  <div class="form-card">
+    <div class="page-title">➕ Новое объявление</div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Категория *</label>
+        <select name="category" class="form-select" required>
+          <option value="">— Выберите —</option>
+          <option value="trade" {% if form.category.value == 'trade' %}selected{% endif %}>🔄 Трейд — меняю на что-то</option>
+          <option value="sell" {% if form.category.value == 'sell' %}selected{% endif %}>💰 Продаю — за реальные деньги/договор</option>
+          <option value="giveaway" {% if form.category.value == 'giveaway' %}selected{% endif %}>🎁 Раздача — отдаю бесплатно</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Заголовок *</label>
+        <input type="text" name="title" class="form-input" placeholder="Например: Продаю Strawberry Elephant OG" value="{{ form.title.value|default:'' }}" required maxlength="200">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Описание *</label>
+        <textarea name="description" class="form-textarea" rows="4" placeholder="Опишите подробно что предлагаете, состояние, условия..." required maxlength="2000">{{ form.description.value|default:'' }}</textarea>
+      </div>
+
+      <div style="background:rgba(0,255,136,0.03); border:1px solid var(--border-green); border-radius:12px; padding:20px; margin-bottom:1.5rem">
+        <div style="font-family:'Orbitron',monospace; font-size:0.8rem; color:var(--green-neon); letter-spacing:2px; margin-bottom:16px">
+          🧠 БРЕЙНРОТ
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem">
+          <label class="form-label">Выбрать из списка</label>
+          <select name="brainrot" class="form-select">
+            <option value="">— Выберите брейнрота —</option>
+            {% for rarity_name, brainrots in brainrots_by_rarity.items %}
+              <optgroup label="━━ {{ rarity_name }} ━━">
+                {% for br in brainrots %}
+                  <option value="{{ br.pk }}" {% if form.brainrot.value == br.pk|stringformat:'s' %}selected{% endif %}>
+                    {{ br.name }}
+                  </option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="text-align:center; color:var(--text-muted); margin:10px 0; font-size:0.85rem">— или —</div>
+
+        <div class="form-group" style="margin-bottom:1rem">
+          <label class="form-label">Своё название брейнрота</label>
+          <input type="text" name="custom_brainrot_name" class="form-input" placeholder="Например: Noobini Pizzanini Galaxy" value="{{ form.custom_brainrot_name.value|default:'' }}" maxlength="100">
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Фото брейнрота</label>
+          <input type="file" name="custom_brainrot_image" class="form-file" accept="image/*">
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px">Загрузи скриншот своего брейнрота из игры</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Что хочешь получить взамен</label>
+        <input type="text" name="want_description" class="form-input" placeholder="Например: Ballerina Cappuccina Legendary или договоримся" value="{{ form.want_description.value|default:'' }}" maxlength="300">
+      </div>
+
+      {% for field in form %}
+        {% if field.errors %}
+          {% for err in field.errors %}
+            <div class="form-error">❌ {{ field.label }}: {{ err }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      <div style="display:flex; gap:1rem; margin-top:2rem">
+        <button type="submit" class="btn btn-primary" style="flex:1; justify-content:center; padding:14px">
+          ✅ Опубликовать
+        </button>
+        <a href="{% url 'index' %}" class="btn btn-outline" style="padding:14px 24px">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

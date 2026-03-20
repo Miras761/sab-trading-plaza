@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: sab-trading-plaza
+    env: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_brainrots
+    startCommand: gunicorn sab_trading.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+    disk:
+      name: media
+      mountPath: /opt/render/project/src/media
+      sizeGB: 1
+
+databases:
+  - name: sab-trading-db
+    databaseName: sab_trading
+    user: sab_admin

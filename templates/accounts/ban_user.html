@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Бан пользователя{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:2rem">
+  <div class="delete-card" style="border-color:rgba(248,113,113,0.3); max-width:480px; margin:0 auto">
+    <div style="text-align:center; margin-bottom:2rem">
+      <div style="font-size:3rem; margin-bottom:12px">🚫</div>
+      <div style="font-family:'Orbitron',monospace; font-size:1.2rem; color:#f87171; letter-spacing:2px">БАН ПОЛЬЗОВАТЕЛЯ</div>
+      <div style="color:var(--text-muted); margin-top:8px">
+        <strong style="color:var(--green-neon)">{{ target.username }}</strong> / {{ target.profile.display_name }}
+      </div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Причина бана</label>
+        <input type="text" name="reason" class="form-input" placeholder="Нарушение правил, спам, мошенничество..." required>
+      </div>
+      <div style="display:flex; gap:1rem; margin-top:1.5rem">
+        <button type="submit" style="flex:1; background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.5); color:#f87171; padding:14px; border-radius:8px; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem; cursor:pointer; letter-spacing:1px; text-transform:uppercase">
+          🚫 Заблокировать
+        </button>
+        <a href="{% url 'profile' target.username %}" class="btn btn-outline" style="padding:14px 24px">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
