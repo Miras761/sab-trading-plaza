@@ -7,57 +7,23 @@
 
     <div style="font-size:3rem; margin-bottom:1rem">💛</div>
     <div class="donate-title">ПОДДЕРЖАТЬ САЙТ</div>
-    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.7; margin-top:0.5rem; margin-bottom:1.5rem">
+    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.7; margin-top:0.5rem; margin-bottom:2rem">
       SAB Trading Plaza работает бесплатно для всех игроков.<br>
       Твоя поддержка помогает держать сервер онлайн! 🚀
     </p>
 
-    <div style="background:rgba(0,255,136,0.04); border:1px solid var(--border-green); border-radius:12px; padding:16px; margin-bottom:1.5rem">
-      <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">PayPal аккаунт</div>
-      <div style="font-family:'Share Tech Mono',monospace; color:var(--green-neon); font-size:1rem; font-weight:700">
-        {{ paypal_email }}
-      </div>
-    </div>
+    <a href="https://www.paypal.com/ncp/payment/BUFRV4M7VKGL4"
+       target="_blank" class="donate-btn" style="margin:0 auto; font-size:1.1rem; padding:16px 40px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.338-8.558 6.338H9.828c-.19 0-.376.068-.52.19-.143.124-.24.295-.272.484l-1.337 8.47H10.6a.641.641 0 0 0 .633-.548l.026-.13.504-3.19.032-.177a.641.641 0 0 1 .633-.548h.398c2.58 0 4.599-.543 5.69-1.81.952-1.086 1.261-2.596.706-4.792z"/>
+      </svg>
+      💛 Поддержать через PayPal
+    </a>
 
-    <!-- Суммы для быстрого доната -->
-    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px">Выбери сумму:</div>
-    <div class="donate-amounts">
-      <a href="https://www.paypal.com/paypalme/{{ paypal_username }}/1" target="_blank" class="amount-btn">$1</a>
-      <a href="https://www.paypal.com/paypalme/{{ paypal_username }}/3" target="_blank" class="amount-btn">$3</a>
-      <a href="https://www.paypal.com/paypalme/{{ paypal_username }}/5" target="_blank" class="amount-btn">$5</a>
-      <a href="https://www.paypal.com/paypalme/{{ paypal_username }}/10" target="_blank" class="amount-btn">$10</a>
+    <div style="margin-top:2rem; font-size:0.8rem; color:var(--text-muted); line-height:1.6">
+      🔒 Оплата через официальный PayPal — безопасно<br>
+      💚 Все донаты идут на поддержку сервера
     </div>
-
-    <!-- Кнопка любая сумма -->
-    <div style="margin-top:1rem">
-      <a href="https://www.paypal.com/paypalme/{{ paypal_username }}" target="_blank" class="donate-btn" style="margin:0 auto">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.338-8.558 6.338H9.828c-.19 0-.376.068-.52.19-.143.124-.24.295-.272.484l-1.337 8.47H10.6a.641.641 0 0 0 .633-.548l.026-.13.504-3.19.032-.177a.641.641 0 0 1 .633-.548h.398c2.58 0 4.599-.543 5.69-1.81.952-1.086 1.261-2.596.706-4.792z"/>
-        </svg>
-        💛 Донат — любая сумма
-      </a>
-    </div>
-
-    <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border-green)">
-      <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.6">
-        🔒 Оплата через официальный PayPal — безопасно<br>
-        💚 Все донаты идут на поддержку сервера
-      </div>
-    </div>
-
-    <!-- PayPal официальная кнопка (через hosted button) -->
-    {% if paypal_button_id %}
-    <div style="margin-top:1.5rem">
-      <form action="https://www.paypal.com/donate" method="post" target="_blank">
-        <input type="hidden" name="hosted_button_id" value="{{ paypal_button_id }}">
-        <button type="submit" style="background:none; border:none; cursor:pointer; padding:0">
-          <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
-               alt="Donate with PayPal"
-               style="border-radius:8px; height:40px">
-        </button>
-      </form>
-    </div>
-    {% endif %}
 
   </div>
 </div>
