@@ -3,10 +3,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>{% block title %}SAB Trading Plaza{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <meta name="description" content="SAB Trading Plaza — торговая площадка для Steal a Brainrot. Трейды, продажи и раздача брейнротов!">
+  <meta name="description" content="SAB Trading Plaza — торговая площадка Steal a Brainrot">
+  <meta name="theme-color" content="#020c06">
 </head>
 <body>
 
@@ -16,12 +17,16 @@
       <span>🧠</span> SAB TRADING PLAZA
     </a>
     <div class="nav-links">
-      <a href="{% url 'index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">🏠 Главная</a>
+      <a href="{% url 'donate' %}" class="nav-link" style="color:#fbbf24">💛 Донат</a>
+      <a href="{% url 'index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">🏠 <span>Главная</span></a>
       {% if user.is_authenticated %}
-        <a href="{% url 'create_listing' %}" class="nav-link">➕ Объявление</a>
-        <a href="{% url 'my_listings' %}" class="nav-link">📋 Мои</a>
-        <a href="{% url 'profile' user.username %}" class="nav-link">👤 {{ user.profile.display_name }}</a>
-        <a href="{% url 'logout' %}" class="nav-link">Выход</a>
+        {% if user.is_superuser %}
+          <a href="{% url 'admin_panel' %}" class="nav-link" style="color:#fbbf24; border-color:rgba(251,191,36,0.3)">⚙️ <span>Админ</span></a>
+        {% endif %}
+        <a href="{% url 'create_listing' %}" class="nav-link">➕ <span>Объявление</span></a>
+        <a href="{% url 'my_listings' %}" class="nav-link">📋 <span>Мои</span></a>
+        <a href="{% url 'profile' user.username %}" class="nav-link">👤 <span>{{ user.profile.display_name }}</span></a>
+        <a href="{% url 'logout' %}" class="nav-link">🚪</a>
       {% else %}
         <a href="{% url 'login' %}" class="nav-link">Войти</a>
         <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Регистрация</a>
@@ -43,9 +48,69 @@
 {% block content %}{% endblock %}
 
 <footer class="footer">
-  <span>SAB TRADING PLAZA</span> &mdash; Неофициальная торговая площадка Steal a Brainrot &mdash; 2025
+  <span>SAB TRADING PLAZA</span> &mdash; Неофициальная площадка Steal a Brainrot &mdash; 2025
+  <br style="margin-top:8px">
+  <button onclick="openDonate()" style="background:none; border:none; cursor:pointer; color:#60a5fa; font-size:0.85rem; font-family:'Share Tech Mono',monospace; margin-top:8px; text-decoration:underline">
+    💙 Поддержать проект
+  </button>
 </footer>
 
+<!-- Floating Donate Button -->
+<div class="donate-float">
+  <button onclick="openDonate()" class="donate-btn">
+    <span class="paypal-icon">💙</span> Донат 500 ₸
+  </button>
+</div>
+
+<!-- Donate Modal -->
+<div class="donate-modal-overlay" id="donateModal" onclick="closeDonateOutside(event)">
+  <div class="donate-modal">
+    <div style="font-size:3rem; margin-bottom:12px">💙</div>
+    <div class="donate-modal-title">ПОДДЕРЖИ SAB PLAZA</div>
+    <div style="color:var(--text-muted); font-size:0.85rem; margin-top:6px; font-family:'Share Tech Mono',monospace">
+      // через PayPal //
+    </div>
+
+    <div class="donate-amount">500 ₸ ≈ $1</div>
+
+    <div class="donate-desc">
+      Твой донат помогает держать сайт онлайн,<br>
+      добавлять новые брейнроты и улучшать площадку!<br><br>
+      <strong style="color:var(--green-neon)">Спасибо что поддерживаешь! 🧠</strong>
+    </div>
+
+    <!-- PayPal donation link - замени YOUR_PAYPAL_EMAIL на свой email PayPal -->
+    <a href="https://www.paypal.com/donate?business=YOUR_PAYPAL_EMAIL&amount=1&currency_code=USD&item_name=SAB+Trading+Plaza+Support"
+       target="_blank"
+       class="paypal-link">
+      <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png"
+           alt="PayPal" style="height:20px; filter:brightness(10)">
+      Задонатить через PayPal
+    </a>
+
+    <div style="margin-top:12px; font-size:0.8rem; color:var(--text-muted)">
+      Оплата в USD ($1 ≈ 500 ₸). Безопасно через PayPal.
+    </div>
+
+    <button class="donate-close" onclick="closeDonate()">✕ Закрыть</button>
+  </div>
+</div>
+
 <script src="{% static 'js/main.js' %}"></script>
+<script>
+function openDonate() {
+  document.getElementById('donateModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDonate() {
+  document.getElementById('donateModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeDonateOutside(e) {
+  if (e.target === document.getElementById('donateModal')) closeDonate();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDonate(); });
+</script>
+
 </body>
 </html>

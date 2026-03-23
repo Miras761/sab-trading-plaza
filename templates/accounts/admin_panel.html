@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}Админ Панель — SAB Trading Plaza{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:2rem">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem">
+    <h1 style="font-family:'Orbitron',monospace; font-size:1.5rem; color:var(--green-neon); text-shadow:var(--glow-sm); letter-spacing:3px">
+      ⚙️ АДМИН ПАНЕЛЬ
+    </h1>
+    <span style="font-family:'Share Tech Mono',monospace; font-size:0.8rem; color:var(--text-muted)">
+      👑 Создатель: {{ request.user.username }}
+    </span>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem">
+    <div style="background:var(--bg-card); border:1px solid var(--border-green); border-radius:12px; padding:20px; text-align:center">
+      <div style="font-family:'Orbitron',monospace; font-size:2rem; color:var(--green-neon); text-shadow:var(--glow-sm)">{{ total_users }}</div>
+      <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px; text-transform:uppercase; letter-spacing:1px">Пользователей</div>
+    </div>
+    <div style="background:var(--bg-card); border:1px solid var(--border-green); border-radius:12px; padding:20px; text-align:center">
+      <div style="font-family:'Orbitron',monospace; font-size:2rem; color:#fbbf24; text-shadow:0 0 10px rgba(251,191,36,0.3)">{{ total_listings }}</div>
+      <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px; text-transform:uppercase; letter-spacing:1px">Объявлений</div>
+    </div>
+    <div style="background:var(--bg-card); border:1px solid rgba(248,113,113,0.3); border-radius:12px; padding:20px; text-align:center">
+      <div style="font-family:'Orbitron',monospace; font-size:2rem; color:#f87171; text-shadow:0 0 10px rgba(248,113,113,0.3)">{{ total_banned }}</div>
+      <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px; text-transform:uppercase; letter-spacing:1px">Заблокировано</div>
+    </div>
+  </div>
+
+  <!-- Listings -->
+  <div style="background:var(--bg-card); border:1px solid var(--border-green); border-radius:16px; overflow:hidden; margin-bottom:2rem">
+    <div style="padding:20px 24px; border-bottom:1px solid var(--border-green); font-family:'Orbitron',monospace; font-size:0.9rem; color:var(--green-neon); letter-spacing:2px">
+      📋 ВСЕ ОБЪЯВЛЕНИЯ
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%; border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(0,255,136,0.04)">
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">#</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Заголовок</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Категория</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Автор</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Дата</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Действие</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for listing in listings %}
+          <tr style="border-bottom:1px solid rgba(0,255,136,0.06); transition:background 0.2s" onmouseover="this.style.background='rgba(0,255,136,0.03)'" onmouseout="this.style.background='transparent'">
+            <td style="padding:12px 16px; color:var(--text-muted); font-size:0.85rem">{{ listing.pk }}</td>
+            <td style="padding:12px 16px">
+              <a href="{% url 'listing_detail' listing.pk %}" style="color:var(--text-primary); text-decoration:none; font-weight:600; font-size:0.9rem">
+                {{ listing.title|truncatechars:40 }}
+              </a>
+            </td>
+            <td style="padding:12px 16px">
+              <span class="cat-badge cat-{{ listing.category }}" style="font-size:0.7rem">
+                {% if listing.category == 'trade' %}🔄{% elif listing.category == 'sell' %}💰{% else %}🎁{% endif %}
+                {{ listing.get_category_display }}
+              </span>
+            </td>
+            <td style="padding:12px 16px">
+              <a href="{% url 'profile' listing.author.username %}" style="color:var(--green-neon); text-decoration:none; font-size:0.9rem">
+                {{ listing.author.profile.display_name }}
+              </a>
+            </td>
+            <td style="padding:12px 16px; color:var(--text-muted); font-size:0.8rem; font-family:'Share Tech Mono',monospace">
+              {{ listing.created_at|date:"d.m.Y" }}
+            </td>
+            <td style="padding:12px 16px">
+              <a href="{% url 'admin_delete_listing' listing.pk %}"
+                 onclick="return confirm('Удалить это объявление?')"
+                 class="btn btn-danger btn-sm">🗑️ Удалить</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="padding:32px; text-align:center; color:var(--text-muted)">Нет объявлений</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Users -->
+  <div style="background:var(--bg-card); border:1px solid var(--border-green); border-radius:16px; overflow:hidden">
+    <div style="padding:20px 24px; border-bottom:1px solid var(--border-green); font-family:'Orbitron',monospace; font-size:0.9rem; color:var(--green-neon); letter-spacing:2px">
+      👥 ВСЕ ПОЛЬЗОВАТЕЛИ
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%; border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(0,255,136,0.04)">
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Пользователь</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Ник</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Статус</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Объявлений</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Регистрация</th>
+            <th style="padding:12px 16px; text-align:left; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border-green)">Действие</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr style="border-bottom:1px solid rgba(0,255,136,0.06); {% if u.profile.is_banned %}background:rgba(248,113,113,0.03){% endif %}" onmouseover="this.style.background='rgba(0,255,136,0.03)'" onmouseout="this.style.background='{% if u.profile.is_banned %}rgba(248,113,113,0.03){% endif %}'">
+            <td style="padding:12px 16px">
+              <a href="{% url 'profile' u.username %}" style="color:var(--text-primary); text-decoration:none; font-weight:600; font-size:0.9rem">
+                {{ u.username }}
+              </a>
+              {% if u.is_superuser %}<span style="margin-left:6px; font-size:0.7rem; background:rgba(0,255,136,0.15); color:var(--green-neon); padding:2px 8px; border-radius:10px">ADMIN</span>{% endif %}
+            </td>
+            <td style="padding:12px 16px; color:var(--text-secondary); font-size:0.9rem">{{ u.profile.display_name }}</td>
+            <td style="padding:12px 16px">
+              <span style="font-size:0.8rem; font-weight:700; color:{{ u.profile.status_color }}">
+                {{ u.profile.status_label }}
+              </span>
+              {% if u.profile.ban_reason %}
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px">{{ u.profile.ban_reason }}</div>
+              {% endif %}
+            </td>
+            <td style="padding:12px 16px; color:var(--text-muted); font-size:0.85rem">{{ u.listings.count }}</td>
+            <td style="padding:12px 16px; color:var(--text-muted); font-size:0.8rem; font-family:'Share Tech Mono',monospace">
+              {{ u.date_joined|date:"d.m.Y" }}
+            </td>
+            <td style="padding:12px 16px">
+              {% if not u.is_superuser %}
+                {% if u.profile.is_banned %}
+                  <a href="{% url 'unban_user' u.username %}" class="btn btn-outline btn-sm">✅ Разбан</a>
+                {% else %}
+                  <a href="{% url 'ban_user' u.username %}" class="btn btn-danger btn-sm">🚫 Бан</a>
+                {% endif %}
+              {% else %}
+                <span style="color:var(--text-muted); font-size:0.8rem">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="padding:32px; text-align:center; color:var(--text-muted)">Нет пользователей</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -11,13 +11,32 @@
         {{ profile_user.profile.display_name|slice:":1"|upper }}
       {% endif %}
     </div>
+
     <div class="profile-name">{{ profile_user.profile.display_name }}</div>
     <div class="profile-username">@{{ profile_user.username }}</div>
+
+    <!-- Status badge -->
+    <div style="margin-top:10px">
+      <span style="font-size:0.85rem; font-weight:700; padding:4px 16px; border-radius:20px;
+        background:rgba(0,0,0,0.3); border:1px solid;
+        color:{{ profile_user.profile.status_color }};
+        border-color:{{ profile_user.profile.status_color }}33">
+        {{ profile_user.profile.status_label }}
+      </span>
+    </div>
+
+    {% if profile_user.profile.is_banned %}
+      <div style="margin-top:10px; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.3); border-radius:8px; padding:10px 20px; display:inline-block">
+        <span style="color:#f87171; font-size:0.9rem; font-weight:600">🚫 Причина: {{ profile_user.profile.ban_reason }}</span>
+      </div>
+    {% endif %}
+
     {% if profile_user.profile.roblox_username %}
-      <div style="margin-top:8px; color:var(--text-secondary); font-size:0.9rem">
+      <div style="margin-top:10px; color:var(--text-secondary); font-size:0.9rem">
         🎮 Roblox: <strong>{{ profile_user.profile.roblox_username }}</strong>
       </div>
     {% endif %}
+
     {% if profile_user.profile.bio %}
       <div style="margin-top:12px; color:var(--text-muted); max-width:500px; margin-left:auto; margin-right:auto; line-height:1.6">
         {{ profile_user.profile.bio }}
@@ -37,11 +56,18 @@
       </div>
     </div>
 
-    {% if user == profile_user %}
-      <div style="margin-top:20px">
+    <div style="margin-top:20px; display:flex; justify-content:center; gap:1rem; flex-wrap:wrap">
+      {% if user == profile_user %}
         <a href="{% url 'edit_profile' %}" class="btn btn-outline">✏️ Редактировать профиль</a>
-      </div>
-    {% endif %}
+      {% endif %}
+      {% if user.is_superuser and not profile_user.is_superuser %}
+        {% if profile_user.profile.is_banned %}
+          <a href="{% url 'unban_user' profile_user.username %}" class="btn btn-outline" style="color:var(--green-neon)">✅ Разбанить</a>
+        {% else %}
+          <a href="{% url 'ban_user' profile_user.username %}" class="btn btn-danger">🚫 Заблокировать</a>
+        {% endif %}
+      {% endif %}
+    </div>
   </div>
 
   <h2 style="font-family:'Orbitron',monospace; font-size:1.1rem; color:var(--green-neon); letter-spacing:2px; margin-bottom:1.5rem">

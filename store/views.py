@@ -115,3 +115,13 @@ def delete_listing(request, pk):
 def my_listings(request):
     listings = Listing.objects.filter(author=request.user, is_active=True)
     return render(request, 'store/my_listings.html', {'listings': listings})
+
+
+def donate(request):
+    from django.conf import settings
+    context = {
+        'paypal_email': getattr(settings, 'PAYPAL_EMAIL', ''),
+        'paypal_username': getattr(settings, 'PAYPAL_USERNAME', ''),
+        'paypal_button_id': getattr(settings, 'PAYPAL_BUTTON_ID', ''),
+    }
+    return render(request, 'store/donate.html', context)
